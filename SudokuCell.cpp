@@ -11,10 +11,18 @@ SudokuCell::SudokuCell(int index, SudokuCell* prevCell):
 {
     if (index < 81)
     {
+        mRow = ((index - 1) / 9) + 1;
+        mCol = ((index - 1) % 9) + 1;
+        mQuad = ((((index - 1) / 27) + 1) - 1);
+        mQuad = mQuad + (((index - 1) / 3) % 3);
+        mQuad = mQuad + ((((((index - 1) / 27) + 1) - 1) * 2) + 1);
         nextCell = new SudokuCell(index + 1, this);
     }
     else
     {
+        mRow = 9;
+        mCol = 9;
+        mQuad = 9;
         nextCell = 0;
     }
     clearMe();
@@ -33,6 +41,8 @@ void SudokuCell::clearMe()
 
 bool SudokuCell::solveMe()
 {
+    cout << "======================" << endl;
+    printBoard();
 labelmebro:
     if ((curNum = nextNumber()) && (!violatesConstraint(curNum)))
     {
@@ -70,6 +80,19 @@ void SudokuCell::printBoard()
     // clearMe();
     // for (int i = 0; i < 15; i++)
     //     cout << nextNumber() << endl;
+
+    // if (((index - 1) % 9) == 8)
+    // {
+    //     cout << " " << mQuad << endl;
+    // }
+    // else
+    // {
+    //     cout << " " << mQuad;
+    // }
+    // if (nextCell)
+    // {
+    //     nextCell->printBoard();
+    // }
 
     if (((index - 1) % 9) == 8)
     {
@@ -119,27 +142,31 @@ bool SudokuCell::violatesConstraint(int num)
 {
     if (!prevCell)
     {
-        cout << "NEVER HAPPENED. WALK AWAY." << endl;
-        return true;
+        return false;
     }
-    if (prevCell->violatesRowBackward(num) ||
-        prevCell->violatesColBackward(num) ||
-        prevCell->violatesQuadBackward(num))
-
+    if (prevCell->checkConstraint(num, mRow, mCol, mQuad))
     {
         return true;
     }
     return false;
 }
 
-bool SudokuCell::violatesRowBackward(int num)
+bool SudokuCell::checkConstraint(int num, int row, int col, int quad)
 {
-}
-
-bool SudokuCell::violatesColBackward(int num)
-{
-}
-
-bool SudokuCell::violatesQuadBackward(int num)
-{
+    if (((mRow == row) ||
+        (mCol == col) ||
+        (mQuad == quad)) &&
+        (curNum == num))
+    {
+        return true;
+    }
+    else
+    {
+        if (prevCell)
+        {
+            return prevCell->checkConstraint(num, row, col, quad);
+        }
+        else
+            return false;
+    }
 }
