@@ -5,25 +5,28 @@ using std::endl;
 
 #include "SudokuCell.h"
 
-SudokuCell::SudokuCell(int index, SudokuCell* prevCell):
-    index(index),
-    prevCell(prevCell)
+SudokuCell::SudokuCell(int index, SudokuCell* prevCell, SudokuCell* zerothCell):
+    mIndex(index),
+    mpPrevCell(prevCell),
+    mpZerothCell(zerothCell)
 {
-    if (index < 81)
+    if (mpZerothCell == 0)
+        this->mpZerothCell = this;
+    if (mIndex < 81)
     {
-        mRow = ((index - 1) / 9) + 1;
-        mCol = ((index - 1) % 9) + 1;
-        mQuad = ((((index - 1) / 27) + 1) - 1);
-        mQuad = mQuad + (((index - 1) / 3) % 3);
-        mQuad = mQuad + ((((((index - 1) / 27) + 1) - 1) * 2) + 1);
-        nextCell = new SudokuCell(index + 1, this);
+        mRow = ((mIndex - 1) / 9) + 1;
+        mCol = ((mIndex - 1) % 9) + 1;
+        mQuad = ((((mIndex - 1) / 27) + 1) - 1);
+        mQuad = mQuad + (((mIndex - 1) / 3) % 3);
+        mQuad = mQuad + ((((((mIndex - 1) / 27) + 1) - 1) * 2) + 1);
+        mpNextCell = new SudokuCell(mIndex + 1, this, mpZerothCell);
     }
     else
     {
         mRow = 9;
         mCol = 9;
         mQuad = 9;
-        nextCell = 0;
+        mpNextCell = 0;
     }
     clearMe();
 }
@@ -32,42 +35,36 @@ SudokuCell::SudokuCell(int index, SudokuCell* prevCell):
 
 void SudokuCell::clearMe()
 {
-    curNum = 0;
+    mCurNum = 0;
     for (int i = 0; i < 10; i++)
     {
-        numsTried[i] = false;
+        mNumsTried[i] = false;
     }
 }
 
 bool SudokuCell::solveMe()
 {
-    cout << "======================" << endl;
-    printBoard();
-labelmebro:
-    if ((curNum = nextNumber()) && (!violatesConstraint(curNum)))
+    while (mCurNum = nextNumber())
     {
-        // We found a number that works so far
-        if (nextCell)
+        if (!violatesConstraint())
         {
-            if (nextCell->solveMe())
+            // We found a number that works so far
+            if (mpNextCell)
             {
-                return true;
+                if (mpNextCell->solveMe())
+                {
+                    return true;
+                }
             }
             else
             {
-                goto labelmebro;
+                cout << "We found a board" << endl;
+                return true; // We found a board!
             }
         }
-        else
-        {
-            return true; // We found a board!
-        }
     }
-    else
-    {
-        clearMe();
-        return false; // false == didn't find a complete board
-    }
+    clearMe();
+    return false; // false == didn't find a complete board
 }
 
 void SudokuCell::printBoard()
@@ -81,7 +78,7 @@ void SudokuCell::printBoard()
     // for (int i = 0; i < 15; i++)
     //     cout << nextNumber() << endl;
 
-    // if (((index - 1) % 9) == 8)
+    // if (((mIndex - 1) % 9) == 8)
     // {
     //     cout << " " << mQuad << endl;
     // }
@@ -89,22 +86,22 @@ void SudokuCell::printBoard()
     // {
     //     cout << " " << mQuad;
     // }
-    // if (nextCell)
+    // if (mpNextCell)
     // {
-    //     nextCell->printBoard();
+    //     mpNextCell->printBoard();
     // }
 
-    if (((index - 1) % 9) == 8)
+    if (((mIndex - 1) % 9) == 8)
     {
-        cout << " " << curNum << endl;
+        cout << " " << mCurNum << endl;
     }
     else
     {
-        cout << " " << curNum;
+        cout << " " << mCurNum;
     }
-    if (nextCell)
+    if (mpNextCell)
     {
-        nextCell->printBoard();
+        mpNextCell->printBoard();
     }
 }
 
@@ -115,20 +112,19 @@ int SudokuCell::nextNumber()
     bool anyNumsLeft = false;
     for (int i = 1; i < 10; i++)
     {
-        if (!numsTried[i])
+        if (!mNumsTried[i])
         {
             anyNumsLeft = true;
         }
     }
     if (anyNumsLeft)
     {
-        bool keepLooking = true;
-        while (curNum = ((rand() % 9) + 1))
+        while (mCurNum = ((rand() % 9) + 1))
         {
-            if (!numsTried[curNum])
+            if (!mNumsTried[mCurNum])
             {
-                numsTried[curNum] = true;
-                return curNum;
+                mNumsTried[mCurNum] = true;
+                return mCurNum;
             }
         }
     }
@@ -138,13 +134,13 @@ int SudokuCell::nextNumber()
     }
 }
 
-bool SudokuCell::violatesConstraint(int num)
+bool SudokuCell::violatesConstraint()
 {
-    if (!prevCell)
+    if (!mpPrevCell)
     {
         return false;
     }
-    if (prevCell->checkConstraint(num, mRow, mCol, mQuad))
+    if (mpPrevCell->checkConstraint(mCurNum, mRow, mCol, mQuad))
     {
         return true;
     }
@@ -154,17 +150,17 @@ bool SudokuCell::violatesConstraint(int num)
 bool SudokuCell::checkConstraint(int num, int row, int col, int quad)
 {
     if (((mRow == row) ||
-        (mCol == col) ||
-        (mQuad == quad)) &&
-        (curNum == num))
+         (mCol == col) ||
+         (mQuad == quad)) &&
+        (mCurNum == num))
     {
         return true;
     }
     else
     {
-        if (prevCell)
+        if (mpPrevCell)
         {
-            return prevCell->checkConstraint(num, row, col, quad);
+            return mpPrevCell->checkConstraint(num, row, col, quad);
         }
         else
             return false;
