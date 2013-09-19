@@ -12,5 +12,11 @@ class SudokuCell
   bool numsTried[10];
   SudokuCell *nextCell, *prevCell;
 
-  bool nextNumber();
+  int nextNumber();
+  bool violatesConstraint(int num);
+ protected:
+  bool violatesRowBackward(int num);
+  bool violatesColBackward(int num);
+  bool violatesQuadBackward(int num);
+
 };
