@@ -1,0 +1,5 @@
+** Pick a number that doesn't violate constraints
+*** A number I haven't picked yet
+*** A number which doesn't disagree with all cells "before" me
+** Once that number is picked, pass control to the "next" cell
+** If there are no numbers left, clear my state and pass control to "previous" cells
