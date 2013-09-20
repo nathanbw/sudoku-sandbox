@@ -2,6 +2,7 @@ class SudokuCell
 {
  public:
   SudokuCell(int index, SudokuCell* prevCell, SudokuCell* zerothCell);
+  ~SudokuCell();
   bool solveMe();
   void clearMe();
   int getCurNum();

@@ -31,7 +31,11 @@ SudokuCell::SudokuCell(int index, SudokuCell* prevCell, SudokuCell* zerothCell):
     clearMe();
 }
 
-// TODO Destructor
+SudokuCell::~SudokuCell()
+{
+    if (mpNextCell)
+        delete mpNextCell;
+}
 
 void SudokuCell::clearMe()
 {
