@@ -10,6 +10,7 @@ The sudoku grid is represented as a doubly-linked list of SudokuCell instances. 
  - Its "next" neighbor (next from a LTR, TTB perspective)
 
 The algorithm used to find a solved sudoku grid is as follows:
+
 (Written from the perspective of a sudoku cell)
 ```
 function solveMe
