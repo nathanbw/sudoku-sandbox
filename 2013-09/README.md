@@ -10,7 +10,6 @@ The sudoku grid is represented as a doubly-linked list of SudokuCell instances. 
  - Its "next" neighbor (next from a LTR, TTB perspective)
 
 The algorithm used to find a solved sudoku grid is as follows:
-
 (Written from the perspective of a sudoku cell)
 ```
 function solveMe
@@ -32,9 +31,24 @@ Key Features
 ------------
 You'll note that the constructor is recursive; if you instantiate a single SudokuCell instance, an entire board is created. You interact directly with the first cell, but that cell is essentially your interface to the entire board.
 
+Example Run
+-----------
+```
+$ g++ -o sudoku-gen main.cpp SudokuCell.cpp && ./sudoku-gen
+We found a board
+ 3 9 4 1 6 2 5 7 8
+ 2 1 5 3 7 8 6 4 9
+ 6 7 8 9 5 4 2 1 3
+ 1 5 6 2 9 3 7 8 4
+ 4 3 9 5 8 7 1 2 6
+ 7 8 2 4 1 6 9 3 5
+ 9 4 3 6 2 1 8 5 7
+ 5 2 7 8 3 9 4 6 1
+ 8 6 1 7 4 5 3 9 2
+```
+
 Pitfalls/TODO/Hopes and Dreams
 ------------------------------
-
 Currently, we pass the "zerothCell" pointer into to each sudokuCell instance. I think it might be better to add a SudokuBoard class that instantiates the SudokuCell objects, preventing direct manipulation from callers.
 
 The code could be enhanced to check constraint violations in both directions (next cells as well as previous cells.) Also, we could add a flag to each cell denoting whether their current value is a given (immutable.) With these two features, we could solve partially-completed sudoku grids as well as generating solutions from empty grids.
